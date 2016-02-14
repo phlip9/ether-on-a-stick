@@ -1,4 +1,5 @@
 data pools[]( recipient, name[1], name_len, condition[1], condition_len, deadline, voting_threshold, balance, vote_position, num_contributors, address_list[], pool[]( commitment, vote))
+data owner
 
 # Create a new Incentivization Pool
 def create_pool(id, recipient, name: str, condition: str, max_duration, voting_threshold):
@@ -13,6 +14,7 @@ def create_pool(id, recipient, name: str, condition: str, max_duration, voting_t
     self.pools[id].voting_threshold = voting_threshold
     self.pools[id].balance = 0
     self.pools[id].vote_position = 0
+    self.owner = msg.sender
     return(1)
 
 def get_recipient(id):
@@ -125,3 +127,10 @@ def abstain(id):
                     return(1)
     else:
         return(0)
+
+def kill():
+    if self.owner == msg.sender:
+        suicide(self.owner)
+    else:
+        return(0)
+
