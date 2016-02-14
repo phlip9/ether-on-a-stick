@@ -1,0 +1,24 @@
+data pool[](address, commitment, vote)
+data addresses[]
+data sum
+
+def create():
+    pass
+
+def commit(value):
+    pass
+
+def vote_yes():
+    if pool[msg.sender]:
+        pool[msg.sender].vote = 1
+    # TODO update sum
+
+def vote_no():
+    if pool[msg.sender]:
+        pool[msg.sender].vote = 0
+    # TODO update sum
+
+def abstain():
+    if pool[msg.sender]:
+        pool[msg.sender].vote = -1
+    # TODO update sum
