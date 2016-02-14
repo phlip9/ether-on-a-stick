@@ -1,14 +1,82 @@
-data pool[](address, commitment, vote)
-data addresses[]
-data sum
+data pools[](
+    recipient,
+    name:str,
+    condition:str,
+    deadline,
+    voting_threshold,
+    balance,
+    vote_position,
+    num_contributors,
+    address_list[],
+    pool[](
+        commitment,
+        vote
+    )
+)
 
-def create():
-    pass
+# Create a new Incentivization Pool
+def create_pool(id, recipient, name, max_duration, voting_threshold):
+    if self.pools[id].recipient:
+        return(0)
+    self.pools[id].recipient = recipient
+    self.pools[id].name = name
+    self.pools[id].deadline = block.timestamp + max_duration
+    self.pools[id].voting_threshold = voting_threshold
+    self.pools[id].balance = 0
+    self.pools[id].vote_position = 0
+    return(1)
 
-def commit(value):
-    pass
+def get_recipient(id):
+    return(self.pools[id].recipient)
 
-def vote_yes():
+def get_name(id):
+    return(self.pools[id].name)
+
+def get_condition(id):
+    return(self.pools[id].condition)
+
+# Get the portion of voters that must agree that an event did, in fact, take
+# place, for some pool.
+def get_voting_threshold(id):
+    return(self.pools[id].voting_threshold)
+
+# Retrieve the total amount of ether people have committed to the pool with
+# this id.
+def get_balance(id):
+    return(self.pools[id].balance)
+
+# Get current swing of voting power.
+def get_vote_position(id):
+    return(self.pools[id].vote_position)
+
+# Commit funds to a pool.
+def commit(id):
+    # pool doesn't exist
+    if !self.pools[id].recipient:
+        # do we have to refund here?
+        # send(msg.sender, msg.value)
+        return(0)
+    with sender = msg.sender:
+        with commitment = msg.value:
+            with prev_commitment = self.pools[id].pool[sender].commitment:
+                # This sender has already committed.
+                if prev_commitment != 0:
+                    with vote = self.pools[id].pool[sender].vote:
+                        self.pools[id].pool[sender].commitment += commitment
+                        self.pools[id].voting_power += vote * commitment
+                        return(1)
+                else:
+                    with num_contributors = self.pools[id].num_contributors:
+                        self.pools[id].address_list[num_contributors] = sender
+                        self.pools[id].num_contributors += 1
+                        self.pools[id].balance += commitment
+                        self.pools[id].pool[sender].commitment = commitment
+                        self.pools[id].pool[sender].vote = 0
+                        return(1)
+
+
+def vote_yes(id):
+    self.pools[id].pool[msg.sender].vote
     if pool[msg.sender]:
         pool[msg.sender].vote = 1
     # TODO update sum
