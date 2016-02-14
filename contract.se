@@ -1,11 +1,12 @@
 data pools[]( recipient, name, condition, deadline, voting_threshold, balance, vote_position, num_contributors, address_list[], pool[]( commitment, vote))
 
 # Create a new Incentivization Pool
-def create_pool(id, recipient, name, max_duration, voting_threshold):
+def create_pool(id, recipient, name:str, condition:str, max_duration, voting_threshold):
     if self.pools[id].recipient:
         return(0)
     self.pools[id].recipient = recipient
     self.pools[id].name = name
+    self.pools[id].condition = condition
     self.pools[id].deadline = block.timestamp + max_duration
     self.pools[id].voting_threshold = voting_threshold
     self.pools[id].balance = 0
