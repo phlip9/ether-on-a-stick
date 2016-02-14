@@ -8,17 +8,60 @@ def create():
 def commit(value):
     pass
 
-def vote_yes():
-    if pool[msg.sender]:
-        pool[msg.sender].vote = 1
-    # TODO update sum
+
+def vote_yes(id):
+    if self.pools[id] and self.pools[id].pool[msg.sender]:
+        with commitment = self.pools[id].pool[msg.sender].commitment:
+            with vote = self.pools[id].pool[msg.sender].vote:
+                # No additional commitments added - typical case
+                if msg.amount == 0:
+                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].balance += commitment
+                    self.pools[id].pool[msg.sender].vote = 1
+                    return(1)
+                else:  # Additional commitments
+                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].pool[msg.sender].commitment += msg.amount
+                    self.pools[id].balance += self.pools[id].pool[msg.sender].commitment
+                    self.pools[id].pool[msg.sender].vote = 1
+                    return(1)
+    else:
+        return(0)
+
 
 def vote_no():
-    if pool[msg.sender]:
-        pool[msg.sender].vote = 0
-    # TODO update sum
+    if self.pools[id] and self.pools[id].pool[msg.sender]:
+        with commitment = self.pools[id].pool[msg.sender].commitment:
+            with vote = self.pools[id].pool[msg.sender].vote:
+                # No additional commitments added - typical case
+                if msg.amount == 0:
+                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].balance -= commitment
+                    self.pools[id].pool[msg.sender].vote = -1
+                    return(1)
+                else:  # Additional commitments
+                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].pool[msg.sender].commitment += msg.amount
+                    self.pools[id].balance -= self.pools[id].pool[msg.sender].commitment
+                    self.pools[id].pool[msg.sender].vote = -1
+                    return(1)
+    else:
+        return(0)
+
 
 def abstain():
-    if pool[msg.sender]:
-        pool[msg.sender].vote = -1
-    # TODO update sum
+    if self.pools[id] and self.pools[id].pool[msg.sender]:
+        with commitment = self.pools[id].pool[msg.sender].commitment:
+            with vote = self.pools[id].pool[msg.sender].vote:
+                # No additional commitments added - typical case
+                if msg.amount == 0:
+                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].pool[msg.sender].vote = 0
+                    return(1)
+                else:  # Additional commitments
+                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].pool[msg.sender].commitment += msg.amount
+                    self.pools[id].pool[msg.sender].vote = 0
+                    return(1)
+    else:
+        return(0)
