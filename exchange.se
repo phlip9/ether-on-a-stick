@@ -1,0 +1,14 @@
+data balances[][]
+data orders[](buys[](user, price, quantity), sells[](user, price, quantity))
+
+def fill_buy_order(currency, order_id):
+    q = self.orders[currency].buys[order_id].quantity
+    bal = self.balances[msg.sender][currency]
+    buyer = self.orders[currency].buys[order_id].user
+    if q > 0:
+        amount = min(q, bal)
+        self.balances[msg.sender][currency] -= amount
+        self.balances[buyer][currency] += amount
+        self.balances[msg.sender][0] += amount * self.orders[currency].buys[order_id].price
+        self.balances[buyer][0] -= amount * self.orders[currency].buys[order_id].price
+        self.orders[currency].buys[order_id].quantity -= amount

@@ -1,0 +1,9 @@
+def register(key, value):
+    if not self.storage[key]:
+        self.storage[key] = value
+        return 1
+    else:
+        return 0
+
+def ask(key):
+    return self.storage[key]
