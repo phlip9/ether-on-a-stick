@@ -146,7 +146,8 @@ def abstain(id):
 def reward(id):
     if self.pools[id].vote_position >= self.pools[id].balance * self.pools[id].voting_threshold / 100:
         send(self.pools[id].recipient, self.pools[id].balance)
-        self.destroy(id)
+        # TODO: fix
+        # self.destroy(id)
         return(1)
     return(0)
 
@@ -158,7 +159,9 @@ def refund(id):
                 with addr = self.pools[id].address_list[i]:
                     with commitment = self.pools[id].pool[addr].commitment:
                         send(addr, commitment)
-        self.destroy(id)
+                i += 1
+        # TODO: fix
+        # self.destroy(id)
         return(1)
     return(0)
 
@@ -188,7 +191,7 @@ def destroy(id):
     return(0)
 
 def check_deadline(id):
-    # TODO
+    # TODO: implement deadline checking
     return(0)
 
 
