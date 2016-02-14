@@ -14,6 +14,8 @@ def create_pool(id, recipient, name: str, condition: str, max_duration, voting_t
     self.pools[id].voting_threshold = voting_threshold
     self.pools[id].balance = 0
     self.pools[id].vote_position = 0
+    self.pools[id].num_contributors = 0
+    # TODO: remove after testing
     self.owner = msg.sender
     return(1)
 
@@ -45,7 +47,10 @@ def get_balance(id):
 def get_vote_position(id):
     return(self.pools[id].vote_position)
 
-# Commit funds to a pool.
+def get_num_contributors(id):
+    return(self.pools[id].num_contributors)
+
+# A participant commits funds to a pool.
 def commit(id):
     # pool doesn't exist
     if !self.pools[id].recipient:
@@ -71,63 +76,79 @@ def commit(id):
                         self.pools[id].pool[sender].vote = 0
                         return(1)
 
+# A participant casts their vote in favor of an event happening and
+# paying forward the commitments to the recipient.
 def vote_yes(id):
     if self.pools[id].recipient and self.pools[id].pool[msg.sender].commitment:
         with commitment = self.pools[id].pool[msg.sender].commitment:
             with vote = self.pools[id].pool[msg.sender].vote:
                 # No additional commitments added - typical case
                 if msg.value == 0:
-                    self.pools[id].balance -= vote * commitment
-                    self.pools[id].balance += commitment
+                    self.pools[id].vote_position -= vote * commitment
+                    self.pools[id].vote_position += commitment
                     self.pools[id].pool[msg.sender].vote = 1
-                    return(1)
                 else:  # Additional commitments
-                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].vote_position -= vote * commitment
                     self.pools[id].pool[msg.sender].commitment += msg.value
-                    self.pools[id].balance += self.pools[id].pool[msg.sender].commitment
+                    self.pools[id].vote_position += self.pools[id].pool[msg.sender].commitment
                     self.pools[id].pool[msg.sender].vote = 1
-                    return(1)
+                # pay forward
+                if self.pools[id].vote_position >= self.pools[id].balance * self.pools[id].voting_threshold / 100:
+                    send(self.pools[id].recipient, self.pools[id].balance)
+                    # destroy
+                return(1)
     else:
         return(0)
 
-
+# A participant casts their vote in favor of returning the funds from the
+# pool to the participants.
 def vote_no(id):
     if self.pools[id].recipient and self.pools[id].pool[msg.sender].commitment:
         with commitment = self.pools[id].pool[msg.sender].commitment:
             with vote = self.pools[id].pool[msg.sender].vote:
                 # No additional commitments added - typical case
                 if msg.value == 0:
-                    self.pools[id].balance -= vote * commitment
-                    self.pools[id].balance -= commitment
+                    self.pools[id].vote_position -= vote * commitment
+                    self.pools[id].vote_position -= commitment
                     self.pools[id].pool[msg.sender].vote = -1
-                    return(1)
                 else:  # Additional commitments
-                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].vote_position -= vote * commitment
                     self.pools[id].pool[msg.sender].commitment += msg.value
-                    self.pools[id].balance -= self.pools[id].pool[msg.sender].commitment
+                    self.pools[id].vote_position -= self.pools[id].pool[msg.sender].commitment
                     self.pools[id].pool[msg.sender].vote = -1
-                    return(1)
+                # refund
+                if self.pools[id].vote_position <= self.pools[id].balance * self.pools[id].voting_threshold / 100:
+                    with num_contributors = self.pools[id].num_contributors:
+                        i = 0
+                        while i < num_contributors:
+                            with addr = self.pools[id].address_list[i]:
+                                with commitment = self.pools[id].pool[addr].commitment:
+                                    send(addr, commitment)
+                    # destroy
+                return(1)
     else:
         return(0)
 
-
+# A participant either changes their previously cast vote to a neutral
+# abstain (potentially to keep the pool going), or this does nothing
+# if they haven't already voted.
 def abstain(id):
     if self.pools[id].recipient and self.pools[id].pool[msg.sender].commitment:
         with commitment = self.pools[id].pool[msg.sender].commitment:
             with vote = self.pools[id].pool[msg.sender].vote:
                 # No additional commitments added - typical case
                 if msg.value == 0:
-                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].vote_position -= vote * commitment
                     self.pools[id].pool[msg.sender].vote = 0
-                    return(1)
                 else:  # Additional commitments
-                    self.pools[id].balance -= vote * commitment
+                    self.pools[id].vote_position -= vote * commitment
                     self.pools[id].pool[msg.sender].commitment += msg.value
                     self.pools[id].pool[msg.sender].vote = 0
-                    return(1)
+                return(1)
     else:
         return(0)
 
+# TODO: remove after testing
 def kill():
     if self.owner == msg.sender:
         suicide(self.owner)
