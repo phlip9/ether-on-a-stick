@@ -29,7 +29,7 @@ def vote_yes(id):
         return(0)
 
 
-def vote_no():
+def vote_no(id):
     if self.pools[id] and self.pools[id].pool[msg.sender]:
         with commitment = self.pools[id].pool[msg.sender].commitment:
             with vote = self.pools[id].pool[msg.sender].vote:
@@ -49,7 +49,7 @@ def vote_no():
         return(0)
 
 
-def abstain():
+def abstain(id):
     if self.pools[id] and self.pools[id].pool[msg.sender]:
         with commitment = self.pools[id].pool[msg.sender].commitment:
             with vote = self.pools[id].pool[msg.sender].vote:
