@@ -7,12 +7,20 @@ from ethereum import utils as u
 def convert_hex_int(hex_str):
     return int('0x' + hex_str.encode('hex'), 16)
 
+def to_ether(wei):
+    return wei / 10L**18
+
+def to_wei(ether):
+    return ether * 10**18
 
 class TestContract(unittest.TestCase):
 
     def setUp(self):
         self.s = t.state()
         self.c = self.s.abi_contract('contract.se')
+
+    def balance(self, acct):
+        return self.s.block.get_balance(acct)
 
     def test_create_pool(self):
         self.assertEqual(self.c.create_pool(123, t.a0, 'my contract', 'some event', 100, 1234), 1)
@@ -25,9 +33,11 @@ class TestContract(unittest.TestCase):
 
     def test_commit(self):
         self.c.create_pool(123, t.a0, 'my contract', 'some event', 100, 1234)
-        # self.s.send(t.a0, t.a1, 100000000)
-        self.s.send(t.k0, self.c.address, 1000000000000)
-        # self.c.commit(123)
+        a1_bal = self.balance(t.a1)
+        self.assertEqual(1, self.c.commit(123, sender=t.k1, value=to_wei(1000)))
+        assert a1_bal - to_wei(1000) > self.balance(t.a1) # account for gas
+        self.assertEqual(self.c.get_balance(123), to_wei(1000))
+        self.assertEqual(self.c.get_vote_position(123), 0)
 
     def test_kill(self):
         self.c.create_pool(123, t.a0, 'my contract', 'some event', 100, 1234)
