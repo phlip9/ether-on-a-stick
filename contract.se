@@ -65,6 +65,8 @@ def commit(id):
                     with vote = self.pools[id].pool[sender].vote:
                         self.pools[id].pool[sender].commitment += commitment
                         self.pools[id].vote_position += vote * commitment
+                        if self.pools[id].vote_position <= self.pools[id].balance * self.pools[id].voting_threshold / 100 or self.pools[id].vote_position >= self.pools[id].balance * self.pools[id].voting_threshold / 100:
+                            self.destroy(id)
                         return(1)
                 # new commitment
                 else:
@@ -92,10 +94,9 @@ def vote_yes(id):
                     self.pools[id].pool[msg.sender].commitment += msg.value
                     self.pools[id].vote_position += self.pools[id].pool[msg.sender].commitment
                     self.pools[id].pool[msg.sender].vote = 1
-                # pay forward
+                # reward
                 if self.pools[id].vote_position >= self.pools[id].balance * self.pools[id].voting_threshold / 100:
-                    send(self.pools[id].recipient, self.pools[id].balance)
-                    # destroy
+                    self.reward(id)
                 return(1)
     else:
         return(0)
@@ -117,14 +118,8 @@ def vote_no(id):
                     self.pools[id].vote_position -= self.pools[id].pool[msg.sender].commitment
                     self.pools[id].pool[msg.sender].vote = -1
                 # refund
-                if self.pools[id].vote_position <= self.pools[id].balance * self.pools[id].voting_threshold / 100:
-                    with num_contributors = self.pools[id].num_contributors:
-                        i = 0
-                        while i < num_contributors:
-                            with addr = self.pools[id].address_list[i]:
-                                with commitment = self.pools[id].pool[addr].commitment:
-                                    send(addr, commitment)
-                    # destroy
+                if self.pools[id].vote_position <= self.pools[id].balance * self.pools[id].voting_threshold / -100:
+                    self.refund(id)
                 return(1)
     else:
         return(0)
@@ -147,6 +142,55 @@ def abstain(id):
                 return(1)
     else:
         return(0)
+
+def reward(id):
+    if self.pools[id].vote_position >= self.pools[id].balance * self.pools[id].voting_threshold / 100:
+        send(self.pools[id].recipient, self.pools[id].balance)
+        self.destroy(id)
+        return(1)
+    return(0)
+
+def refund(id):
+    if self.pools[id].vote_position <= self.pools[id].balance * self.pools[id].voting_threshold / 100:
+        with num_contributors = self.pools[id].num_contributors:
+            i = 0
+            while i < num_contributors:
+                with addr = self.pools[id].address_list[i]:
+                    with commitment = self.pools[id].pool[addr].commitment:
+                        send(addr, commitment)
+        self.destroy(id)
+        return(1)
+    return(0)
+
+# data pools[]( recipient, name[1], name_len, condition[1], condition_len,
+# deadline, voting_threshold, balance, vote_position, num_contributors,
+# address_list[], pool[]( commitment, vote))
+def destroy(id):
+    if self.pools[id].vote_position <= self.pools[id].balance * self.pools[id].voting_threshold / 100 or self.pools[id].vote_position >= self.pools[id].balance * self.pools[id].voting_threshold / 100:
+        self.pools[id].recipient = 0
+        self.pools[id].name[0] = 0
+        self.pools[id].name_len = 0
+        self.pools[id].condition[0] = 0
+        self.pools[id].condition_len = 0
+        self.pools[id].deadline = 0
+        self.pools[id].voting_threshold = 0
+        self.pools[id].balance = 0
+        self.pools[id].vote_position = 0
+        c = self.pools[id].num_contributors
+        self.pools[id].num_contributors = 0
+        i = 0
+        while i < c:
+            addr = self.pools[id].address_list[addr]
+            self.pools[id].address_list[addr] = 0
+            self.pools[id].pool[addr].commitment = 0
+            self.pools[id].pool[addr].vote = 0
+        return(1)
+    return(0)
+
+def check_deadline(id):
+    # TODO
+    return(0)
+
 
 # TODO: remove after testing
 def kill():

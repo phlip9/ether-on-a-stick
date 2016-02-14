@@ -42,12 +42,16 @@ class TestContract(unittest.TestCase):
     def test_vote(self):
         self.assertEqual(1, self.c.create_pool(123, t.a0, 'my contract', 'some event', 100, 50))
 
+        # k1 commits 1000 eth
         self.assertEqual(1, self.c.commit(123, sender=t.k1, value=to_wei(1000)))
         self.assertEqual(to_wei(1000), self.c.get_balance(123))
+        # k2 commits 500 eth
         self.assertEqual(1, self.c.commit(123, sender=t.k2, value=to_wei(500)))
         self.assertEqual(to_wei(1500), self.c.get_balance(123))
+        # k3 commits 250 eth
         self.assertEqual(1, self.c.commit(123, sender=t.k3, value=to_wei(250)))
         self.assertEqual(to_wei(1750), self.c.get_balance(123))
+        self.assertEqual(0, self.c.get_vote_position(123))
 
         # k2 votes no with 500 eth
         self.assertEqual(1, self.c.vote_no(123, sender=t.k2))
