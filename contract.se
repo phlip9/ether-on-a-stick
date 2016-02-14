@@ -1,4 +1,5 @@
-data pools[]( recipient, name:str, condition:str, deadline, voting_threshold, balance, vote_position, num_contributors, address_list[], pool[]( commitment, vote)) 
+data pools[]( recipient, name, condition, deadline, voting_threshold, balance, vote_position, num_contributors, address_list[], pool[]( commitment, vote))
+
 # Create a new Incentivization Pool
 def create_pool(id, recipient, name, max_duration, voting_threshold):
     if self.pools[id].recipient:
@@ -48,7 +49,7 @@ def commit(id):
                 if prev_commitment != 0:
                     with vote = self.pools[id].pool[sender].vote:
                         self.pools[id].pool[sender].commitment += commitment
-                        self.pools[id].voting_power += vote * commitment
+                        self.pools[id].vote_position += vote * commitment
                         return(1)
                 # new commitment
                 else:
@@ -61,7 +62,7 @@ def commit(id):
                         return(1)
 
 def vote_yes(id):
-    if self.pools[id].recipient and self.pools[id].pool[msg.sender]:
+    if self.pools[id].recipient and self.pools[id].pool[msg.sender].commitment:
         with commitment = self.pools[id].pool[msg.sender].commitment:
             with vote = self.pools[id].pool[msg.sender].vote:
                 # No additional commitments added - typical case
@@ -81,7 +82,7 @@ def vote_yes(id):
 
 
 def vote_no(id):
-    if self.pools[id] and self.pools[id].pool[msg.sender]:
+    if self.pools[id].recipient and self.pools[id].pool[msg.sender].commitment:
         with commitment = self.pools[id].pool[msg.sender].commitment:
             with vote = self.pools[id].pool[msg.sender].vote:
                 # No additional commitments added - typical case
@@ -101,7 +102,7 @@ def vote_no(id):
 
 
 def abstain(id):
-    if self.pools[id] and self.pools[id].pool[msg.sender]:
+    if self.pools[id].recipient and self.pools[id].pool[msg.sender].commitment:
         with commitment = self.pools[id].pool[msg.sender].commitment:
             with vote = self.pools[id].pool[msg.sender].vote:
                 # No additional commitments added - typical case
