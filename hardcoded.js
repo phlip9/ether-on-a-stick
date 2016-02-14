@@ -35,18 +35,22 @@ var compiledContract = {"info": {"abiDefinition": [{"constant": false, "type": "
 
 
 
-var etherStickContract = web3.eth.contract(compiledContract.info.abiDefinition);
+var etherStickContract = eth.contract(compiledContract.info.abiDefinition);
 
-var etherStick = etherStickContract.new({from:web3.eth.accounts[0], data: compiledContract.code, gas: 2000000, nonce: 0xDEADBEEF}, function(e, contract){
-    if(!e) {
-      if(!contract.address) {
+var etherStick = etherStickContract.new(
+  {
+    from: eth.accounts[1],
+    data: compiledContract.code,
+    gas: 2000000,
+    gasPrice: 51000000000
+  }, function(e, contract) {
+    if (!e) {
+      if (!contract.address) {
         console.log("Etherstick contract transaction send: TransactionHash: " + contract.transactionHash + " waiting to be mined...");
-
       } else {
         console.log("Etherstick contract mined! Address: " + contract.address);
-        console.log(contract);
+        console.log(JSON.stringify(contract));
       }
-
     } else {
         console.log("Error: " + e);
     }
