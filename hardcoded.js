@@ -39,7 +39,7 @@ var etherStickContract = eth.contract(compiledContract.info.abiDefinition);
 
 var etherStick = etherStickContract.new(
   {
-    from: eth.accounts[1],
+    from: eth.accounts[0],
     data: compiledContract.code,
     gas: 2000000,
     gasPrice: 51000000000
