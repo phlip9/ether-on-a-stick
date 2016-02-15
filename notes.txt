@@ -1,3 +1,39 @@
+## Tabs
+
+Ethereum Wiki
+https://github.com/ethereum/wiki/wiki
+
+Ethereum Network Stats
+https://ethstats.net/
+
+Testnet Wei faucet
+https://zerogox.com/ethereum/wei_faucet
+
+Testing contracts and transactions
+https://ethereum.gitbooks.io/frontier-guide/content/testing_contracts_and_transactions.html
+
+Assurance Contract wiki
+https://www.wikiwand.com/en/Assurance_contract
+
+The private provision of public goods via dominant assurance contracts
+https://mason.gmu.edu/~atabarro/PrivateProvision.pdf
+
+## Max's Pastebin
+
+geth --datadir ./.morden --testnet --verbosity "4" --unlock 0 console
+
+geth --networkid 5106293264 --genesis ./genesis.json --datadir ./.9000 console`
+
+pyethapp --profile morden --data-dir ./.morden run --console`
+
+personal.unlockAccount(eth.accounts[0], "password”)
+balance = web3.fromWei(eth.getBalance(eth.accounts[0]), "ether")
+
+serpent mk_contract_info_decl ether-on-a-stick/contract.se
+loadScript('ether-on-a-stick/hardcoded.js')
+
+## Philip's Pastebin
+
 Private network:
 ---
 
