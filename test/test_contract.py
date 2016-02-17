@@ -1,23 +1,24 @@
-import unittest
-from random import random as rand
-
 from ethereum import tester as t
-from ethereum import utils as u
+# from ethereum import utils as u
+
+import unittest
+
 
 def convert_hex_int(hex_str):
     return int('0x' + hex_str.encode('hex'), 16)
 
+
 def to_ether(wei):
     return wei / 10L**18
+
 
 def to_wei(ether):
     return ether * 10**18
 
+
 def approx(x, y, e):
     return y - e <= x <= y + e
 
-def destroyed(c):
-    return self.assertEqual(c.get_recipient(123), 0)
 
 class TestContract(unittest.TestCase):
 
@@ -27,6 +28,9 @@ class TestContract(unittest.TestCase):
 
     def balance(self, acct):
         return self.s.block.get_balance(acct)
+
+    # def destroyed(c):
+    #     return self.assertEqual(c.get_recipient(123), 0)
 
     def test_create_pool(self):
         self.assertEqual(self.c.create_pool(123, t.a0, 'my contract', 'some event', 100, 50), 1)
@@ -136,6 +140,7 @@ class TestContract(unittest.TestCase):
     def test_kill(self):
         self.c.create_pool(123, t.a0, 'my contract', 'some event', 100, 50)
         ret = self.c.kill()
+        self.assertNotEquals(0, ret)
 
 
 if __name__ == '__main__':
