@@ -1,6 +1,6 @@
 # Ether on a Stick
 
-Max Fang and Philip Hayes
+Max Fang and Philip Hayes. Recipient of $1000 prize at Treehacks Spring 2016
 
 ## What it does
 
